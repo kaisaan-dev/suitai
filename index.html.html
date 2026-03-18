@@ -570,9 +570,9 @@ The letter must be formal, precise, and written as a real IFA would write it. Us
     const response = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
+     body: JSON.stringify({
+  model: 'claude-sonnet-4-5',
+  max_tokens: 2000, 
         stream: false,
         messages: [{ role: 'user', content: prompt }]
       })
