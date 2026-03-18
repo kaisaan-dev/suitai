@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuitaAI — Suitability Letters in Seconds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #0d1b2a;
+  --navy-mid: #162235;
+  --navy-light: #1e3048;
+  --gold: #c9a155;
+  --gold-light: #e8c97a;
+  --cream: #f5f0e8;
+  --cream-dim: #e8e0d0;
+  --text: #f0ece3;
+  --text-muted: rgba(240,236,227,0.55);
+  --border: rgba(201,161,85,0.2);
+  --border-bright: rgba(201,161,85,0.5);
+  --green: #4caf82;
+  --red: #e05c5c;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* BACKGROUND TEXTURE */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(201,161,85,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(201,161,85,0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── HEADER ─── */
+header {
+  position: relative;
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(10px);
+  background: rgba(13,27,42,0.8);
+}
+
+.logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.logo span { color: var(--gold); }
+
+.header-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--border-bright);
+  padding: 5px 12px;
+}
+
+/* ─── MAIN LAYOUT ─── */
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+
+/* ─── HERO ─── */
+.hero {
+  text-align: center;
+  margin-bottom: 56px;
+  animation: fadeUp 0.7s ease both;
+}
+.hero-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 600;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero p {
+  font-size: 15px;
+  color: var(--text-muted);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ─── TWO COL ─── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+/* ─── CARD ─── */
+.card {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  padding: 28px;
+  animation: fadeUp 0.7s ease both;
+}
+.card:nth-child(2) { animation-delay: 0.1s; }
+
+.card-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ─── FORM ─── */
+.field { margin-bottom: 18px; }
+label {
+  display: block;
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+input, select, textarea {
+  width: 100%;
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--border-bright);
+}
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+select { cursor: pointer; }
+select option { background: var(--navy-mid); }
+textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ─── GENERATE BUTTON ─── */
+.btn-generate {
+  width: 100%;
+  background: var(--gold);
+  color: var(--navy);
+  border: none;
+  padding: 14px 24px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 8px;
+  font-weight: 500;
+}
+.btn-generate:hover { background: var(--gold-light); }
+.btn-generate:active { transform: scale(0.99); }
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── OUTPUT PANEL ─── */
+.output-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+}
+
+.output-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+}
+.output-empty .icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+.output-empty p { font-size: 13px; line-height: 1.6; }
+
+.output-content { display: none; flex-direction: column; flex: 1; }
+.output-content.visible { display: flex; }
+
+.output-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.output-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.output-status.generating { color: var(--gold); }
+.output-status.done { color: var(--green); }
+.output-status.error { color: var(--red); }
+
+.btn-copy {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-copy:hover { border-color: var(--border-bright); color: var(--text); }
+.btn-copy.copied { color: var(--green); border-color: var(--green); }
+
+.letter-output {
+  flex: 1;
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  padding: 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-y: auto;
+  min-height: 360px;
+}
+
+/* Loading dots */
+.loading-dots::after {
+  content: '';
+  animation: dots 1.2s infinite;
+}
+@keyframes dots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+}
+
+/* WORD COUNT */
+.word-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  text-align: right;
+  letter-spacing: 1px;
+}
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--border);
+  border-top: none;
+  margin-top: 24px;
+  animation: fadeUp 0.7s 0.2s ease both;
+}
+.stat {
+  padding: 18px 20px;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.stat:last-child { border-right: none; }
+.stat-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ─── API KEY NOTICE ─── */
+.api-notice {
+  background: rgba(201,161,85,0.06);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  padding: 14px 18px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+  animation: fadeUp 0.5s ease both;
+}
+.api-notice strong { color: var(--gold); font-weight: 500; }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Streaming cursor */
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  background: var(--gold);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 0.8s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Suita<span>AI</span></div>
+  <div class="header-badge">Beta — IFA Edition</div>
+</header>
+
+<div class="app">
+
+  <div class="hero">
+    <div class="hero-label">✦ Compliance-Ready in Seconds</div>
+    <h1>Suitability Letters,<br><em>Written by AI.</em></h1>
+    <p>Enter your client details and recommendation. Get a professional, FCA-aligned suitability letter instantly.</p>
+  </div>
+
+  <div class="api-notice">
+    <strong>Demo mode:</strong> This tool uses the Claude AI API. For production, your API key would be secured server-side. To test locally, the key is handled via the fetch call below.
+  </div>
+
+  <div class="two-col">
+
+    <!-- INPUT FORM -->
+    <div class="card">
+      <div class="card-title">✦ Client & Recommendation Details</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Client First Name</label>
+          <input type="text" id="firstName" placeholder="James" />
+        </div>
+        <div class="field">
+          <label>Client Last Name</label>
+          <input type="text" id="lastName" placeholder="Thornton" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Client Age</label>
+          <input type="number" id="clientAge" placeholder="52" min="18" max="100" />
+        </div>
+        <div class="field">
+          <label>Risk Profile</label>
+          <select id="riskProfile">
+            <option value="">Select...</option>
+            <option value="cautious">Cautious</option>
+            <option value="moderately cautious">Moderately Cautious</option>
+            <option value="balanced">Balanced</option>
+            <option value="moderately adventurous">Moderately Adventurous</option>
+            <option value="adventurous">Adventurous</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Recommendation Type</label>
+        <select id="recommendationType">
+          <option value="">Select...</option>
+          <option value="ISA investment">ISA Investment</option>
+          <option value="pension transfer">Pension Transfer</option>
+          <option value="drawdown">Pension Drawdown</option>
+          <option value="annuity purchase">Annuity Purchase</option>
+          <option value="investment bond">Investment Bond</option>
+          <option value="protection/life insurance">Protection / Life Insurance</option>
+          <option value="general investment account">General Investment Account</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Investment Amount (£)</label>
+          <input type="number" id="investmentAmount" placeholder="75000" />
+        </div>
+        <div class="field">
+          <label>Investment Term</label>
+          <input type="text" id="investmentTerm" placeholder="e.g. 10 years" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Client's Financial Objective</label>
+        <textarea id="objective" placeholder="e.g. Accumulate a retirement fund to supplement state pension. Client is 10 years from intended retirement at 62."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Recommended Product / Provider</label>
+        <input type="text" id="product" placeholder="e.g. Vanguard LifeStrategy 60% Equity via Hargreaves Lansdown ISA" />
+      </div>
+
+      <div class="field">
+        <label>Key Suitability Reasons (brief notes)</label>
+        <textarea id="suitabilityNotes" placeholder="e.g. Matches balanced risk profile. Low ongoing charges (0.22% OCF). Diversified across global equities and bonds. Client comfortable with 3-5 year downturns."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Any Exclusions or Client Restrictions</label>
+        <input type="text" id="exclusions" placeholder="e.g. No tobacco, no fossil fuel investments" />
+      </div>
+
+      <button class="btn-generate" id="generateBtn" onclick="generateLetter()">
+        ✦ Generate Suitability Letter
+      </button>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="card output-panel">
+      <div class="card-title">✦ Generated Letter</div>
+
+      <div class="output-empty" id="emptyState">
+        <div class="icon">✉</div>
+        <p>Fill in the client details on the left and click generate.<br>Your FCA-aligned suitability letter will appear here.</p>
+      </div>
+
+      <div class="output-content" id="outputContent">
+        <div class="output-toolbar">
+          <div class="output-status" id="outputStatus"></div>
+          <button class="btn-copy" id="copyBtn" onclick="copyLetter()">Copy Letter</button>
+        </div>
+        <div class="letter-output" id="letterOutput"></div>
+        <div class="word-count" id="wordCount"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-value">~45s</div>
+      <div class="stat-label">Manual average time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">&lt;15s</div>
+      <div class="stat-label">With SuitaAI</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">FCA</div>
+      <div class="stat-label">Aligned output format</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+async function generateLetter() {
+  const btn = document.getElementById('generateBtn');
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const age = document.getElementById('clientAge').value.trim();
+  const risk = document.getElementById('riskProfile').value;
+  const recType = document.getElementById('recommendationType').value;
+  const amount = document.getElementById('investmentAmount').value.trim();
+  const term = document.getElementById('investmentTerm').value.trim();
+  const objective = document.getElementById('objective').value.trim();
+  const product = document.getElementById('product').value.trim();
+  const notes = document.getElementById('suitabilityNotes').value.trim();
+  const exclusions = document.getElementById('exclusions').value.trim();
+
+  if (!firstName || !lastName || !risk || !recType || !objective || !product) {
+    alert('Please fill in: client name, risk profile, recommendation type, objective, and product.');
+    return;
+  }
+
+  // Show output panel
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('outputContent').classList.add('visible');
+  const statusEl = document.getElementById('outputStatus');
+  const letterEl = document.getElementById('letterOutput');
+  const wordCountEl = document.getElementById('wordCount');
+
+  statusEl.className = 'output-status generating';
+  statusEl.innerHTML = 'Generating<span class="loading-dots"></span>';
+  letterEl.innerHTML = '<span class="cursor"></span>';
+  wordCountEl.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  const clientName = `${firstName} ${lastName}`;
+
+  const prompt = `You are a senior Independent Financial Adviser (IFA) in the UK writing a formal suitability letter for a client. Write a complete, professional, FCA-aligned suitability letter based on the following details:
+
+Client Name: ${clientName}
+Client Age: ${age || 'not specified'}
+Risk Profile: ${risk}
+Recommendation Type: ${recType}
+Investment Amount: ${amount ? '£' + parseInt(amount).toLocaleString() : 'not specified'}
+Investment Term: ${term || 'not specified'}
+Client Financial Objective: ${objective}
+Recommended Product/Provider: ${product}
+Key Suitability Reasons: ${notes || 'use standard professional reasoning based on the above'}
+Exclusions/Restrictions: ${exclusions || 'none stated'}
+Date: ${today}
+
+Write the letter with:
+1. A professional header addressed to ${clientName}
+2. Purpose of the letter paragraph
+3. Summary of client circumstances and objectives
+4. Description of the recommendation
+5. Why this recommendation is suitable for this specific client (reference their risk profile, age, objective, and term)
+6. Key risks the client should be aware of
+7. Next steps / what happens now
+8. A professional closing
+
+The letter must be formal, precise, and written as a real IFA would write it. Use UK financial terminology. Do not use bullet points — use flowing professional paragraphs. The tone should be authoritative yet warm.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        stream: false,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const letterText = data.content.map(b => b.text || '').join('');
+
+    // Animate text appearance
+    letterEl.textContent = '';
+    let i = 0;
+    const speed = 6;
+    function typeChar() {
+      if (i < letterText.length) {
+        letterEl.textContent += letterText[i];
+        letterEl.scrollTop = letterEl.scrollHeight;
+        i++;
+        setTimeout(typeChar, speed);
+      } else {
+        statusEl.className = 'output-status done';
+        statusEl.textContent = '✓ Letter Ready';
+        const words = letterText.split(/\s+/).length;
+        wordCountEl.textContent = `${words} words`;
+      }
+    }
+    typeChar();
+
+  } catch (err) {
+    statusEl.className = 'output-status error';
+    statusEl.textContent = '✗ Error — check console';
+    letterEl.textContent = `Error generating letter: ${err.message}\n\nIn production, your API key would be handled server-side via a secure backend endpoint.`;
+    console.error(err);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✦ Generate Suitability Letter';
+}
+
+async function copyLetter() {
+  const text = document.getElementById('letterOutput').textContent;
+  const btn = document.getElementById('copyBtn');
+  if (!text || text.startsWith('Error')) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Letter';
+      btn.classList.remove('copied');
+    }, 2000);
+  } catch {
+    btn.textContent = 'Copy failed';
+  }
+}
+</script>
+</body>
+</html>
